@@ -6,6 +6,7 @@ import coverUnknown from '../../../../assets/covers/unknown.png';
 
 export interface Album {
   name: string;
+  cover: string;
   trackIds: Array<number>;
 }
 
@@ -67,7 +68,7 @@ const initialState: LibraryState = {
   artists: new Map([
     [0, { name: 'Unknown Artist', trackIds: [] }],
     [1, { name: 'Disturbed', trackIds: [0, 1] }],
-    [1, { name: 'AZALEA', trackIds: [2] }],
+    [2, { name: 'AZALEA', trackIds: [2] }],
   ]),
   albums: new Map([
     [0, { name: 'Unknown Album', cover: coverUnknown, trackIds: [] }],

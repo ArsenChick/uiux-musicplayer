@@ -19,6 +19,9 @@ export const store = configureStore({
     player: playerReducer,
     library: playlistsReducer,
   }),
+  devTools: {
+    serialize: true,
+  },
 });
 
 export type AppDispatch = typeof store.dispatch;
