@@ -10,8 +10,8 @@ export interface PlayerState {
 }
 
 const initialState: PlayerState = {
-  currentPlaylist: [],
-  currentTrackId: null,
+  currentPlaylist: [2],
+  currentTrackId: 2,
   volume: 0.5,
   timePosInSeconds: 0,
   durationInSeconds: 0,
@@ -22,11 +22,14 @@ const getNewTrack = (state: PlayerState, isNext = true) => {
   const currentPlaylistPos = state.currentPlaylist.findIndex(
     (trackId) => trackId === state.currentTrackId
   );
-  const prevIndex = currentPlaylistPos === 0 ? 0 : currentPlaylistPos - 1;
+  const prevIndex =
+    currentPlaylistPos === 0
+      ? 0
+      : state.currentPlaylist[currentPlaylistPos - 1];
   const nextIndex =
     currentPlaylistPos === state.currentPlaylist?.length
-      ? currentPlaylistPos
-      : currentPlaylistPos + 1;
+      ? state.currentPlaylist[currentPlaylistPos]
+      : state.currentPlaylist[currentPlaylistPos + 1];
   return isNext ? nextIndex : prevIndex;
 };
 

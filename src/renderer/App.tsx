@@ -1,48 +1,26 @@
 import { Routes, Route } from 'react-router-dom';
-import icon from '../../assets/icon.svg';
 import './App.css';
+import { Player } from './components/Player/Player';
+import { Sidebar } from './components/Sidebar/Sidebar';
 
-const Hello = () => {
+const Hello = ({ name }: any) => {
   return (
     <div>
-      <div className="Hello">
-        <img width="200px" alt="icon" src={icon} />
-      </div>
-      <h1>electron-react-boilerplate</h1>
-      <div className="Hello">
-        <a
-          href="https://electron-react-boilerplate.js.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              📚
-            </span>
-            Read our docs
-          </button>
-        </a>
-        <a
-          href="https://github.com/sponsors/electron-react-boilerplate"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              🙏
-            </span>
-            Donate
-          </button>
-        </a>
-      </div>
+      <h1>{name}</h1>
     </div>
   );
 };
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Hello />} />
-    </Routes>
+    <>
+      <Sidebar />
+      <Routes>
+        <Route path="/" element={<Hello name="Main" />} />
+        <Route path="albums" element={<Hello name="Albums" />} />
+        <Route path="artists" element={<Hello name="Artists" />} />
+      </Routes>
+      <Player />
+    </>
   );
 }

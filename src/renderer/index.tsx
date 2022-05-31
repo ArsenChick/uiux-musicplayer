@@ -1,18 +1,20 @@
-import { createRoot } from 'react-dom/client';
+import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
 
 import App from './App';
 import { store } from './store';
 
+require('./ui/icons');
+
 const container = document.getElementById('root')!;
-const root = createRoot(container);
-root.render(
+ReactDOM.render(
   <MemoryRouter>
     <Provider store={store}>
       <App />
     </Provider>
-  </MemoryRouter>
+  </MemoryRouter>,
+  container
 );
 
 // calling IPC exposed from preload script

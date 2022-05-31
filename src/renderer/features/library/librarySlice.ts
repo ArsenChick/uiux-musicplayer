@@ -4,23 +4,14 @@ import cover1 from '../../../../assets/covers/cover1.jpg';
 import cover2 from '../../../../assets/covers/cover2.jpg';
 import coverUnknown from '../../../../assets/covers/unknown.png';
 
-export interface Album {
+export interface IPlaylist {
+  id: number;
   name: string;
   cover: string;
   trackIds: Array<number>;
 }
 
-export interface Playlist {
-  name: string;
-  trackIds: Array<number>;
-}
-
-export interface Artist {
-  name: string;
-  trackIds: Array<number>;
-}
-
-export interface Track {
+export interface ITrack {
   id: number;
   src: string;
   title: string;
@@ -30,31 +21,31 @@ export interface Track {
 }
 
 export interface LibraryState {
-  tracks: Array<Track>;
+  tracks: Array<ITrack>;
   mainPlaylist: Array<number>;
-  artists: Map<number, Artist>;
-  albums: Map<number, Album>;
-  playlists: Map<number, Playlist>;
+  artists: Array<IPlaylist>;
+  albums: Array<IPlaylist>;
+  playlists: Array<IPlaylist>;
 }
 
 const initialState: LibraryState = {
   tracks: [
-    {
-      id: 0,
-      src: require('../../../../assets/audio/The Light.mp3'),
-      title: 'The Light',
-      cover: cover1,
-      artist: 1,
-      album: 1,
-    },
-    {
-      id: 1,
-      src: require('../../../../assets/audio/The Vengeful One.mp3'),
-      title: 'The Vengeful One',
-      cover: cover1,
-      artist: 1,
-      album: 1,
-    },
+    // {
+    //   id: 0,
+    //   src: require('../../../../assets/audio/The Light.mp3'),
+    //   title: 'The Light',
+    //   cover: cover1,
+    //   artist: 1,
+    //   album: 1,
+    // },
+    // {
+    //   id: 1,
+    //   src: require('../../../../assets/audio/The Vengeful One.mp3'),
+    //   title: 'The Vengeful One',
+    //   cover: cover1,
+    //   artist: 1,
+    //   album: 1,
+    // },
     {
       id: 2,
       src: require('../../../../assets/audio/Torikoriko PLEASE.mp3'),
@@ -65,23 +56,23 @@ const initialState: LibraryState = {
     },
   ],
   mainPlaylist: [0, 1, 2],
-  artists: new Map([
-    [0, { name: 'Unknown Artist', trackIds: [] }],
-    [1, { name: 'Disturbed', trackIds: [0, 1] }],
-    [2, { name: 'AZALEA', trackIds: [2] }],
-  ]),
-  albums: new Map([
-    [0, { name: 'Unknown Album', cover: coverUnknown, trackIds: [] }],
-    [1, { name: 'Immortalized', cover: cover1, trackIds: [0, 1] }],
-    [2, { name: 'Torikoriko PLEASE', cover: cover2, trackIds: [2] }],
-  ]),
-  playlists: new Map(),
+  artists: [
+    { id: 0, name: 'Unknown Artist', cover: coverUnknown, trackIds: [] },
+    // { id: 1, name: 'Disturbed', cover: cover1, trackIds: [0, 1] },
+    { id: 2, name: 'AZALEA', cover: cover2, trackIds: [2] },
+  ],
+  albums: [
+    { id: 0, name: 'Unknown Album', cover: coverUnknown, trackIds: [] },
+    // { id: 1, name: 'Immortalized', cover: cover1, trackIds: [0, 1] },
+    { id: 2, name: 'Torikoriko PLEASE', cover: cover2, trackIds: [2] },
+  ],
+  playlists: [],
 };
 
 const deleteSongFromCollections = (
-  playlist: Playlist | Album | Artist,
+  playlist: IPlaylist,
   id: number,
-  container: Map<number, Playlist | Album | Artist>,
+  array: Array<IPlaylist>,
   idToDelete: number,
   deleteCollection = false
 ) => {
@@ -89,8 +80,8 @@ const deleteSongFromCollections = (
     (trackId) => trackId !== idToDelete
   );
   if (newPlaylist.length === 0 && deleteCollection && id !== 0)
-    container.delete(id);
-  else container.set(id, { ...playlist, trackIds: newPlaylist });
+    array.filter((currentPlaylist) => id !== currentPlaylist.id);
+  else array[id] = { ...playlist, trackIds: newPlaylist };
 };
 
 export const createTrack = (
@@ -115,7 +106,8 @@ export const librarySlice = createSlice({
       const newId = state.tracks[state.tracks.length - 1].id + 1;
       state.tracks.push({ ...action.payload, id: newId });
       state.mainPlaylist.push(newId);
-      state.artists.get(0)?.trackIds.push(newId);
+      state.artists[0].trackIds.push(newId);
+      state.albums[0].trackIds.push(newId);
     },
     deleteTrackFromLibrary: (state, action) => {
       state.tracks = state.tracks.filter(
@@ -124,60 +116,48 @@ export const librarySlice = createSlice({
 
       state.mainPlaylist.filter((trackId) => trackId !== action.payload);
 
-      state.playlists.forEach((playlist, id, container) => {
-        deleteSongFromCollections(playlist, id, container, action.payload);
+      state.playlists.forEach((playlist, id, array) => {
+        deleteSongFromCollections(playlist, id, array, action.payload);
       });
 
-      state.albums.forEach((playlist, id, container) => {
-        deleteSongFromCollections(
-          playlist,
-          id,
-          container,
-          action.payload,
-          true
-        );
+      state.albums.forEach((playlist, id, array) => {
+        deleteSongFromCollections(playlist, id, array, action.payload, true);
       });
 
-      state.artists.forEach((playlist, id, container) => {
-        deleteSongFromCollections(
-          playlist,
-          id,
-          container,
-          action.payload,
-          true
-        );
+      state.artists.forEach((playlist, id, array) => {
+        deleteSongFromCollections(playlist, id, array, action.payload, true);
       });
     },
     addTrackToPlaylist: (state, action) => {
-      const playlist = state.playlists.get(action.payload.playlistId);
+      const playlist = state.playlists.find(action.payload.playlistId);
       playlist?.trackIds.push(action.payload.trackId);
     },
     deleteTrackFromPlaylist: (state, action) => {
-      const playlist = state.playlists.get(action.payload.playlistId);
+      const playlist = state.playlists.find(action.payload.playlistId);
       playlist?.trackIds.filter((id) => id !== action.payload.trackId);
     },
     createPlaylist: (state, action) => {
-      state.playlists.set(state.playlists.size, {
+      state.playlists.push({
+        id: state.playlists.length,
         name: action.payload,
+        cover: coverUnknown,
         trackIds: [],
       });
     },
     deletePlaylist: (state, action) => {
-      state.playlists.delete(action.payload);
+      state.playlists.filter((track) => track.id !== action.payload);
     },
-    changeTrackPosition: (state, action) => {
-      const { trackId, newIndex } = action.payload;
+    changeTrackPositionInPlaylist: (state, action) => {
+      const { prevIndex, newIndex } = action.payload;
       if (action.payload.isMainPlaylist) {
-        const trackIndex = state.mainPlaylist.findIndex((t) => t === trackId);
-        state.mainPlaylist.splice(trackIndex, 1);
+        const trackId = state.mainPlaylist.splice(prevIndex, 1)[0];
         state.mainPlaylist.splice(newIndex, 0, trackId);
       } else {
-        const playlist = state.playlists.get(
-          action.payload.playlistId
+        const playlist = state.playlists.find(
+          (track) => track.id === action.payload.playlistId
         )?.trackIds;
-        const trackIndex = playlist?.findIndex((t) => t === trackId);
-        playlist?.splice(trackIndex!, 1);
-        state.mainPlaylist.splice(newIndex, 0, trackId);
+        const trackId = playlist?.splice(prevIndex!, 1)[0];
+        state.mainPlaylist.splice(newIndex, 0, trackId!);
       }
     },
   },
@@ -190,6 +170,6 @@ export const {
   deleteTrackFromPlaylist,
   createPlaylist,
   deletePlaylist,
-  changeTrackPosition,
+  changeTrackPositionInPlaylist,
 } = librarySlice.actions;
 export default librarySlice.reducer;

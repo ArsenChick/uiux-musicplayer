@@ -24,3 +24,19 @@ export const fromFileToBlobSrc = (file: File) => {
 export const isAudioType = (file: File) => {
   return file.type.includes('audio');
 };
+
+export const toPercentString = (value: number) => {
+  const percentStr = Math.ceil(value * 100).toString();
+  if (percentStr.length === 1) {
+    return `0${percentStr}`;
+  }
+
+  return percentStr;
+};
+
+export const getVolumeIconName = (volume: number) => {
+  if (volume === 0) return 'Volume0';
+  if (volume < 0.33) return 'Volume1';
+  if (volume < 0.67) return 'Volume2';
+  return 'Volume3';
+};

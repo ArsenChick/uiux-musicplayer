@@ -3,7 +3,7 @@
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
 body {
-  position: relative;
+  /* position: relative;
   color: white;
   height: 100vh;
   background: linear-gradient(
@@ -11,15 +11,15 @@ body {
     #fedc2a -29.09%,
     #dd5789 51.77%,
     #7a2c9e 129.35%
-  );
-  font-family: sans-serif;
-  overflow-y: hidden;
+  ); */
+  font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+  /* overflow-y: hidden;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: center; */
 }
 
-button {
+/* button {
   background-color: white;
   padding: 10px 20px;
   border-radius: 10px;
@@ -59,4 +59,4 @@ a:hover {
   justify-content: center;
   align-items: center;
   margin: 20px 0;
-}
+} */
