@@ -10,7 +10,7 @@ export interface PlayerState {
 }
 
 const initialState: PlayerState = {
-  currentPlaylist: [2],
+  currentPlaylist: [2, 0, 1],
   currentTrackId: 2,
   volume: 0.5,
   timePosInSeconds: 0,

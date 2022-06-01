@@ -30,22 +30,22 @@ export interface LibraryState {
 
 const initialState: LibraryState = {
   tracks: [
-    // {
-    //   id: 0,
-    //   src: require('../../../../assets/audio/The Light.mp3'),
-    //   title: 'The Light',
-    //   cover: cover1,
-    //   artist: 1,
-    //   album: 1,
-    // },
-    // {
-    //   id: 1,
-    //   src: require('../../../../assets/audio/The Vengeful One.mp3'),
-    //   title: 'The Vengeful One',
-    //   cover: cover1,
-    //   artist: 1,
-    //   album: 1,
-    // },
+    {
+      id: 0,
+      src: require('../../../../assets/audio/The Light.mp3'),
+      title: 'The Light',
+      cover: cover1,
+      artist: 1,
+      album: 1,
+    },
+    {
+      id: 1,
+      src: require('../../../../assets/audio/The Vengeful One.mp3'),
+      title: 'The Vengeful One',
+      cover: cover1,
+      artist: 1,
+      album: 1,
+    },
     {
       id: 2,
       src: require('../../../../assets/audio/Torikoriko PLEASE.mp3'),
@@ -58,12 +58,12 @@ const initialState: LibraryState = {
   mainPlaylist: [0, 1, 2],
   artists: [
     { id: 0, name: 'Unknown Artist', cover: coverUnknown, trackIds: [] },
-    // { id: 1, name: 'Disturbed', cover: cover1, trackIds: [0, 1] },
+    { id: 1, name: 'Disturbed', cover: cover1, trackIds: [0, 1] },
     { id: 2, name: 'AZALEA', cover: cover2, trackIds: [2] },
   ],
   albums: [
     { id: 0, name: 'Unknown Album', cover: coverUnknown, trackIds: [] },
-    // { id: 1, name: 'Immortalized', cover: cover1, trackIds: [0, 1] },
+    { id: 1, name: 'Immortalized', cover: cover1, trackIds: [0, 1] },
     { id: 2, name: 'Torikoriko PLEASE', cover: cover2, trackIds: [2] },
   ],
   playlists: [],
