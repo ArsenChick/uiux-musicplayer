@@ -5,7 +5,9 @@ export const fromSecondsToFormattedTime = (seconds: number) => {
   return `${minutes}:${secondsLeft < 10 ? '0' : ''}${secondsLeft}`;
 };
 
-export const fromFileToBlobSrc = (file: File) => {
+export const fromFileToBlobSrc: (
+  file: File
+) => Promise<string | ArrayBuffer | null> = (file: File) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 

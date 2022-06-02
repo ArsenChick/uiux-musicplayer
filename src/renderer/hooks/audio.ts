@@ -11,8 +11,10 @@ import {
 } from 'renderer/store/selectors';
 import { useAppDispatch, useAppSelector } from './app';
 
+const audioObject = new Audio();
+
 const useAudio = () => {
-  const audio = useRef(new Audio());
+  const audio = useRef(audioObject);
   const dispatch = useAppDispatch();
 
   const currentPlayerState = useAppSelector((state) => state.player);
@@ -23,6 +25,11 @@ const useAudio = () => {
     dispatch(setDuration(audio.current.duration));
   };
 
+  audio.current.ontimeupdate = () => {
+    const trackPos = Math.ceil(audio.current.currentTime);
+    dispatch(changeTimePosition(trackPos));
+  };
+
   useEffect(() => {
     audio.current.onended = () => {
       if (canPlayNextTrack) {
@@ -30,6 +37,7 @@ const useAudio = () => {
       } else {
         audio.current.pause();
         dispatch(togglePlayPause());
+        dispatch(changeTimePosition(0));
       }
     };
   }, [canPlayNextTrack, dispatch]);
@@ -41,11 +49,11 @@ const useAudio = () => {
   useEffect(() => {
     if (
       currentPlayerState.currentTrackId !== null &&
-      currentTrackInfo !== null
+      currentTrackInfo.src !== 'null'
     ) {
-      audio.current.src = currentTrackInfo.src!;
+      audio.current.src = currentTrackInfo.src;
     }
-  }, [currentPlayerState.currentTrackId, currentTrackInfo]);
+  }, [currentPlayerState.currentTrackId, currentTrackInfo.src]);
 
   useEffect(() => {
     if (currentPlayerState.isPlaying) {
@@ -54,13 +62,6 @@ const useAudio = () => {
       audio.current.pause();
     }
   }, [currentPlayerState.isPlaying, currentPlayerState.currentTrackId]);
-
-  useEffect(() => {
-    audio.current.ontimeupdate = () => {
-      const trackPos = Math.ceil(audio.current.currentTime);
-      dispatch(changeTimePosition(trackPos));
-    };
-  }, [currentPlayerState.currentTrackId, dispatch]);
 
   return audio;
 };

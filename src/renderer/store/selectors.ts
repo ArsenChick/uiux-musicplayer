@@ -9,7 +9,7 @@ const selectCurrentTrackIndex = createSelector(
   selectCurrentPlaylist,
   selectCurrentTrack,
   (list, track) => {
-    return list.findIndex((t) => t === track);
+    return list.trackIds.findIndex((t) => t === track);
   }
 );
 
@@ -21,7 +21,7 @@ export const canPlayPrevTrackSelector = createSelector(
 export const canPlayNextTrackSelector = createSelector(
   selectCurrentTrackIndex,
   selectCurrentPlaylist,
-  (i, list) => i < list.length - 1
+  (i, list) => i < list.trackIds.length - 1
 );
 
 const selectTracks = (state: AppState) => state.library.tracks;
@@ -37,20 +37,29 @@ export const selectTrackInfo = createSelector(
 export const selectArtistInfo = createSelector(
   selectArtists,
   (artists) => (artistId: number) =>
-    artists.find((playlist) => playlist.id === artistId)
+    artists.find((playlist) => playlist.id === `artists/${artistId}`)
 );
 
 export const selectAlbumInfo = createSelector(
   selectAlbums,
   (albums) => (albumId: number) =>
-    albums.find((playlist) => playlist.id === albumId)
+    albums.find((playlist) => playlist.id === `albums/${albumId}`)
 );
 
 export const selectPlaylistInfo = createSelector(
   selectPlaylists,
   (playlists) => (playlistId: number) =>
-    playlists.find((playlist) => playlist.id === playlistId)
+    playlists.find((playlist) => playlist.id === `playlists/${playlistId}`)
 );
+
+export interface ITrackVerboseInfo {
+  album: string | undefined;
+  artist: string | undefined;
+  id: number;
+  src: string;
+  title: string;
+  cover: string;
+}
 
 const getTrackVerboseInfo = (
   id: number,
@@ -73,10 +82,17 @@ export const selectCurrentTrackInfo = createSelector(
   selectTrackInfo,
   selectAlbumInfo,
   selectArtistInfo,
-  (id, getTrackInfo, getAlbumInfo, getArtistInfo) => {
+  (id, getTrackInfo, getAlbumInfo, getArtistInfo): ITrackVerboseInfo => {
     if (id !== null)
       return getTrackVerboseInfo(id, getTrackInfo, getAlbumInfo, getArtistInfo);
-    return null;
+    return {
+      id: -1,
+      title: 'null',
+      src: 'null',
+      cover: 'null',
+      album: undefined,
+      artist: undefined,
+    };
   }
 );
 

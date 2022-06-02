@@ -1,0 +1,36 @@
+$sideSegmentWidth: 24em;
+$playerHeight: 8em;
+
+.playerWrapper {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: $playerHeight;
+  box-shadow: 0 0 2em 0.25em rgba(0, 0, 0, 0.05);
+
+  .playerContent {
+    display: flex;
+    justify-content: space-between;
+
+    .playerAudioCard {
+      display: flex;
+      align-items: center;
+      width: $sideSegmentWidth;
+
+      img {
+        position: relative;
+        bottom: 0;
+        height: $playerHeight;
+      }
+    }
+
+    .playArea {
+      width: 50%
+    }
+
+    .volumeArea {
+      width: $sideSegmentWidth;
+    }
+  }
+}

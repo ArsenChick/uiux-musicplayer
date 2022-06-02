@@ -16,6 +16,7 @@ import { useBoolean } from '@fluentui/react-hooks';
 
 import { useAppDispatch, useAppSelector } from 'renderer/hooks/app';
 import { createPlaylist } from 'renderer/features/library/librarySlice';
+import './Sidebar.scss';
 
 export const Sidebar = ({ className }: any) => {
   const location = useLocation();
@@ -119,7 +120,7 @@ export const Sidebar = ({ className }: any) => {
 
   return (
     <>
-      <div className={`${className} sidebar-wrapper`}>
+      <div className={`${className || ''} sidebarWrapper`}>
         <Nav
           onLinkClick={onLinkClick}
           selectedKey={location.pathname.slice(1)}

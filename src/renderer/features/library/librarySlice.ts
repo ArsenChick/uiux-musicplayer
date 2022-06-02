@@ -5,7 +5,7 @@ import cover2 from '../../../../assets/covers/cover2.jpg';
 import coverUnknown from '../../../../assets/covers/unknown.png';
 
 export interface IPlaylist {
-  id: number;
+  id: string;
   name: string;
   cover: string;
   trackIds: Array<number>;
@@ -57,16 +57,38 @@ const initialState: LibraryState = {
   ],
   mainPlaylist: [0, 1, 2],
   artists: [
-    { id: 0, name: 'Unknown Artist', cover: coverUnknown, trackIds: [] },
-    { id: 1, name: 'Disturbed', cover: cover1, trackIds: [0, 1] },
-    { id: 2, name: 'AZALEA', cover: cover2, trackIds: [2] },
+    {
+      id: 'artists/0',
+      name: 'Unknown Artist',
+      cover: coverUnknown,
+      trackIds: [],
+    },
+    { id: 'artists/1', name: 'Disturbed', cover: cover1, trackIds: [0, 1] },
+    { id: 'artists/2', name: 'AZALEA', cover: cover2, trackIds: [2] },
   ],
   albums: [
-    { id: 0, name: 'Unknown Album', cover: coverUnknown, trackIds: [] },
-    { id: 1, name: 'Immortalized', cover: cover1, trackIds: [0, 1] },
-    { id: 2, name: 'Torikoriko PLEASE', cover: cover2, trackIds: [2] },
+    {
+      id: 'albums/0',
+      name: 'Unknown Album',
+      cover: coverUnknown,
+      trackIds: [],
+    },
+    { id: 'albums/1', name: 'Immortalized', cover: cover1, trackIds: [0, 1] },
+    {
+      id: 'albums/2',
+      name: 'Torikoriko PLEASE',
+      cover: cover2,
+      trackIds: [2],
+    },
   ],
-  playlists: [],
+  playlists: [
+    {
+      id: 'playlists/0',
+      name: 'Test Playlist',
+      cover: coverUnknown,
+      trackIds: [0, 2, 1],
+    },
+  ],
 };
 
 const deleteSongFromCollections = (
@@ -80,14 +102,14 @@ const deleteSongFromCollections = (
     (trackId) => trackId !== idToDelete
   );
   if (newPlaylist.length === 0 && deleteCollection && id !== 0)
-    array.filter((currentPlaylist) => id !== currentPlaylist.id);
+    array.filter((currentPlaylist) => currentPlaylist.id.endsWith(`${id}`));
   else array[id] = { ...playlist, trackIds: newPlaylist };
 };
 
 export const createTrack = (
   src: string,
-  cover = coverUnknown,
   title = 'No Title',
+  cover = coverUnknown,
   artist = 0,
   album = 0
 ) => ({
@@ -138,7 +160,7 @@ export const librarySlice = createSlice({
     },
     createPlaylist: (state, action) => {
       state.playlists.push({
-        id: state.playlists.length,
+        id: `playlists/${state.playlists.length}`,
         name: action.payload,
         cover: coverUnknown,
         trackIds: [],
@@ -153,11 +175,11 @@ export const librarySlice = createSlice({
         const trackId = state.mainPlaylist.splice(prevIndex, 1)[0];
         state.mainPlaylist.splice(newIndex, 0, trackId);
       } else {
-        const playlist = state.playlists.find(
-          (track) => track.id === action.payload.playlistId
+        const playlistToEdit = state.playlists.find(
+          (playlist) => playlist.id === action.payload.playlistId
         )?.trackIds;
-        const trackId = playlist?.splice(prevIndex!, 1)[0];
-        state.mainPlaylist.splice(newIndex, 0, trackId!);
+        const trackId = playlistToEdit?.splice(prevIndex, 1)[0];
+        playlistToEdit?.splice(newIndex, 0, trackId!);
       }
     },
   },

@@ -14,6 +14,7 @@ import {
   Volume3Icon,
   CirclePauseSolidIcon,
 } from '@fluentui/react-icons-mdl2';
+// import { initializeIcons } from '@fluentui/react';
 
 registerIcons({
   icons: {
@@ -30,6 +31,8 @@ registerIcons({
     Volume2: <Volume2Icon />,
     Volume3: <Volume3Icon />,
     PlaySolid: <PlaySolidIcon />,
-    CirclePauseSolid: <CirclePauseSolidIcon />,
+    CirclePause: <CirclePauseSolidIcon />,
   },
 });
+
+// initializeIcons();

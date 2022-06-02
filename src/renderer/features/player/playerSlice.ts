@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 export interface PlayerState {
-  currentPlaylist: Array<number>;
+  currentPlaylist: { id: string; trackIds: Array<number> };
   currentTrackId: null | number;
   volume: number;
   timePosInSeconds: number;
@@ -10,7 +10,7 @@ export interface PlayerState {
 }
 
 const initialState: PlayerState = {
-  currentPlaylist: [2, 0, 1],
+  currentPlaylist: { id: '', trackIds: [2, 0, 1] },
   currentTrackId: 2,
   volume: 0.5,
   timePosInSeconds: 0,
@@ -18,18 +18,21 @@ const initialState: PlayerState = {
   isPlaying: false,
 };
 
-const getNewTrack = (state: PlayerState, isNext = true) => {
-  const currentPlaylistPos = state.currentPlaylist.findIndex(
-    (trackId) => trackId === state.currentTrackId
+const getNewTrack = (
+  { currentPlaylist, currentTrackId }: PlayerState,
+  isNext = true
+) => {
+  const currentPlaylistPos = currentPlaylist.trackIds.findIndex(
+    (trackId) => trackId === currentTrackId
   );
   const prevIndex =
     currentPlaylistPos === 0
       ? 0
-      : state.currentPlaylist[currentPlaylistPos - 1];
+      : currentPlaylist.trackIds[currentPlaylistPos - 1];
   const nextIndex =
-    currentPlaylistPos === state.currentPlaylist?.length
-      ? state.currentPlaylist[currentPlaylistPos]
-      : state.currentPlaylist[currentPlaylistPos + 1];
+    currentPlaylistPos === currentPlaylist.trackIds.length
+      ? currentPlaylist.trackIds[currentPlaylistPos]
+      : currentPlaylist.trackIds[currentPlaylistPos + 1];
   return isNext ? nextIndex : prevIndex;
 };
 
@@ -68,7 +71,7 @@ export const playerSlice = createSlice({
       state.volume = action.payload;
     },
     stopPlaying: (state) => {
-      state.currentPlaylist = [];
+      state.currentPlaylist = { id: 'none', trackIds: [] };
       state.currentTrackId = null;
       state.isPlaying = false;
     },

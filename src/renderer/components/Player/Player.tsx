@@ -20,9 +20,10 @@ import {
   getVolumeIconName,
   toPercentString,
 } from 'renderer/utils';
-import UI from 'renderer/ui';
+import { AudioCard } from 'renderer/ui/AudioCard/AudioCard';
+import './Player.scss';
 
-export const Player = ({ className }: any) => {
+export const Player = ({ className }: { className?: string }) => {
   const audio = useAudio();
   const dispatch = useAppDispatch();
 
@@ -58,7 +59,15 @@ export const Player = ({ className }: any) => {
     setCurrentTrackPosUX(timePos);
   };
 
-  const onChangedCurrentPos = (_: any, newTimePos: number) => {
+  const onChangedCurrentPos = (
+    _:
+      | React.MouseEvent
+      | React.TouchEvent
+      | MouseEvent
+      | TouchEvent
+      | React.KeyboardEvent,
+    newTimePos: number
+  ) => {
     setUserSeekingPos(false);
     audio.current.currentTime = newTimePos;
     dispatch(changeTimePosition(newTimePos));
@@ -81,15 +90,12 @@ export const Player = ({ className }: any) => {
   };
 
   return (
-    <div className={`${className || ''} player-wrapper`}>
+    <div className={`${className} playerWrapper`}>
       {currentPlayerState.currentTrackId !== null ? (
-        <div className="player-content">
-          <UI.AudioCard
-            className="player-audio-short-info"
-            audioInfo={currentTrackInfo!}
-          />
+        <div className="playerContent">
+          <AudioCard className="playerAudioCard" audioInfo={currentTrackInfo} />
 
-          <div className="play-area">
+          <div className="playArea">
             <div className="control-panel">
               <IconButton
                 iconProps={{ iconName: 'Previous' }}
@@ -128,7 +134,7 @@ export const Player = ({ className }: any) => {
             </div>
           </div>
 
-          <div className="volume-editor">
+          <div className="volumeArea">
             <Icon iconName={getVolumeIconName(currentPlayerState.volume)} />
             <Slider
               className="volume-slider"
@@ -150,4 +156,8 @@ export const Player = ({ className }: any) => {
   );
 };
 
-export default Player;
+Player.defaultProps = {
+  className: '',
+};
+
+export default { Player };

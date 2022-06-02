@@ -1,0 +1,19 @@
+@use '../Player/Player' as player;
+
+.sidebarWrapper {
+  max-height: 100%;
+  min-width: 16em;
+  width: 15%;
+  margin-bottom: player.$playerHeight;
+  border-right: 1px solid #f0f0f0;
+  overflow-y: auto;
+
+  h3 {
+    margin-left: 1em;
+  }
+
+  // svg {
+  //   position: relative;
+  //   bottom: 2px;
+  // }
+}

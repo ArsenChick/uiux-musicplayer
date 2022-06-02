@@ -1,6 +1,8 @@
 import { Icon } from '@fluentui/react';
 import { PlaySolidIcon } from '@fluentui/react-icons-mdl2';
 
+import './AudioCard.scss';
+
 export interface IAudioCard {
   audioInfo: {
     id: number;
@@ -10,7 +12,7 @@ export interface IAudioCard {
     album: string | undefined;
     artist: string | undefined;
   };
-  className: string;
+  className?: string;
   active?: boolean;
   isPlaying?: boolean;
   onClickPlayPause?: () => void;
@@ -35,27 +37,25 @@ export const AudioCard = ({
   };
 
   return (
-    <div className={`audio-info ${className || ''}`}>
-      <div className="player-img">
+    <div className={`audioCard ${className}`}>
+      <div className="playerImg">
         {active ? (
           <Icon
             iconName={isPlaying ? 'CirclePause' : 'PlaySolid'}
-            className="active-track-status"
+            className="activeTrackStatus"
             onClick={(e) => onClickPlayPauseButton(e)}
           />
         ) : null}
 
-        <div
-          className={`active-track-status hover ${showHoverPlay && 'active'}`}
-        >
+        <div className={`activeTrackStatus hover ${showHoverPlay && 'active'}`}>
           <PlaySolidIcon />
         </div>
         <img alt={audioInfo.title} src={audioInfo.cover} />
       </div>
 
-      <div className="short-info">
-        <div className="audio-title">{audioInfo.title}</div>
-        <div className="audio-artist-album">
+      <div className="shortInfo">
+        <div className="songTitle">{audioInfo.title}</div>
+        <div className="songArtistAlbum">
           {`${audioInfo.artist} | ${audioInfo.album}`}
         </div>
       </div>
@@ -64,6 +64,7 @@ export const AudioCard = ({
 };
 
 AudioCard.defaultProps = {
+  className: '',
   active: undefined,
   isPlaying: false,
   onClickPlayPause: undefined,
