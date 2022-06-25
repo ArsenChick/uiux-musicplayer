@@ -1,0 +1,71 @@
+.gridWrapper {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+
+  .gridHeader {
+    position: sticky;
+    top: 0;
+    margin-left: 1em;
+
+    background-color: white;
+    z-index: 9999;
+  }
+
+  .gridContainer {
+    margin: 0 1em 1em;
+    min-height: min-content;
+
+    .gridContent {
+      display: flex;
+      flex-wrap: wrap;
+      max-height: 100%;
+      margin: -0.5em;
+
+      .gridItemWrapper {
+        position: relative;
+        width: 8em;
+        height: 8em;
+        margin: 0.5em;
+
+        cursor: pointer;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .albumName {
+          position: absolute;
+          left: 0;
+          bottom: 0;
+          width: calc(100% - 1em);
+          min-width: 0;
+
+          padding: 0.5em 0.5em;
+
+          background-color: rgba(0, 0, 0, 0.8);
+          color: white;
+
+          text-align: center;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      .gridItemWrapper:hover img {
+        filter: opacity(0.8) drop-shadow(0 0 0 white);
+      }
+    }
+  }
+}
+
+@media (max-width: 705px) {
+  .gridContainer {
+    margin: 0 auto 1em;
+  }
+}

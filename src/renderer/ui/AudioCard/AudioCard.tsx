@@ -41,7 +41,7 @@ export const AudioCard = ({
       <div className="playerImg">
         {active ? (
           <Icon
-            iconName={isPlaying ? 'CirclePause' : 'PlaySolid'}
+            iconName={isPlaying ? 'Pause' : 'PlaySolid'}
             className="activeTrackStatus"
             onClick={(e) => onClickPlayPauseButton(e)}
           />

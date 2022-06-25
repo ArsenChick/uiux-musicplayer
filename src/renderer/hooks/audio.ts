@@ -7,19 +7,21 @@ import {
 } from 'renderer/features/player/playerSlice';
 import {
   canPlayNextTrackSelector,
-  selectCurrentTrackInfo,
+  selectCurrentTrackVerboseInfo,
 } from 'renderer/store/selectors';
 import { useAppDispatch, useAppSelector } from './app';
 
 const audioObject = new Audio();
+let audioPlayPromiseInit: Promise<void> | undefined;
 
 const useAudio = () => {
   const audio = useRef(audioObject);
+  const audioPlayPromise = useRef(audioPlayPromiseInit);
   const dispatch = useAppDispatch();
 
   const currentPlayerState = useAppSelector((state) => state.player);
   const canPlayNextTrack = useAppSelector(canPlayNextTrackSelector);
-  const currentTrackInfo = useAppSelector(selectCurrentTrackInfo);
+  const currentTrackInfo = useAppSelector(selectCurrentTrackVerboseInfo);
 
   audio.current.onloadeddata = () => {
     dispatch(setDuration(audio.current.duration));
@@ -56,9 +58,9 @@ const useAudio = () => {
   }, [currentPlayerState.currentTrackId, currentTrackInfo.src]);
 
   useEffect(() => {
-    if (currentPlayerState.isPlaying) {
-      audio.current.play();
-    } else {
+    if (audio.current.paused && currentPlayerState.isPlaying) {
+      audioPlayPromise.current = audio.current.play();
+    } else if (!audio.current.paused && !currentPlayerState.isPlaying) {
       audio.current.pause();
     }
   }, [currentPlayerState.isPlaying, currentPlayerState.currentTrackId]);

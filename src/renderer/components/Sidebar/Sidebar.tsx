@@ -112,6 +112,11 @@ export const Sidebar = ({ className }: any) => {
     }
   };
 
+  const onHideDialog = () => {
+    toggleHideDialog();
+    setError(false);
+  };
+
   const dialogContentProps = {
     type: DialogType.largeHeader,
     title: 'Create a playlist',
@@ -130,7 +135,7 @@ export const Sidebar = ({ className }: any) => {
       </div>
       <Dialog
         hidden={hideDialog}
-        onDismiss={toggleHideDialog}
+        onDismiss={onHideDialog}
         dialogContentProps={dialogContentProps}
       >
         <TextField
@@ -141,7 +146,7 @@ export const Sidebar = ({ className }: any) => {
         />
         <DialogFooter>
           <PrimaryButton onClick={onSubmitCreation} text="Create" />
-          <DefaultButton onClick={toggleHideDialog} text="Cancel" />
+          <DefaultButton onClick={onHideDialog} text="Cancel" />
         </DialogFooter>
       </Dialog>
     </>

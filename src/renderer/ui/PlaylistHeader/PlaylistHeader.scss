@@ -1,8 +1,36 @@
 .playlistHeaderWrapper {
   height: 20%;
-  max-height: 12em;
+  width: 100%;
+  min-height: 8em;
+  min-width: 0;
+  margin-bottom: 1em;
+
+  position: sticky;
+  top: 0;
+
+  display: flex;
+  align-items: center;
+  z-index: 9999;
+
+  background-color: rgb(230, 230, 230);
+
+  .playlistInfo {
+    width: 0;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  h2 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
   img {
     height: 100%;
+  }
+
+  img + * {
+    margin: 0 1em;
   }
 }

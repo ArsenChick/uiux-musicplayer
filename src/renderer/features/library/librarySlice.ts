@@ -92,18 +92,18 @@ const initialState: LibraryState = {
 };
 
 const deleteSongFromCollections = (
+  result: Array<IPlaylist>,
   playlist: IPlaylist,
   id: number,
-  array: Array<IPlaylist>,
   idToDelete: number,
   deleteCollection = false
 ) => {
   const newPlaylist = playlist.trackIds.filter(
     (trackId) => trackId !== idToDelete
   );
-  if (newPlaylist.length === 0 && deleteCollection && id !== 0)
-    array.filter((currentPlaylist) => currentPlaylist.id.endsWith(`${id}`));
-  else array[id] = { ...playlist, trackIds: newPlaylist };
+  if (id === 0 || newPlaylist.length !== 0 || !deleteCollection)
+    result.push({ ...playlist, trackIds: newPlaylist });
+  return result;
 };
 
 export const createTrack = (
@@ -136,38 +136,59 @@ export const librarySlice = createSlice({
         (track) => track.id !== action.payload
       );
 
-      state.mainPlaylist.filter((trackId) => trackId !== action.payload);
+      state.mainPlaylist = state.mainPlaylist.filter(
+        (trackId) => trackId !== action.payload
+      );
 
-      state.playlists.forEach((playlist, id, array) => {
-        deleteSongFromCollections(playlist, id, array, action.payload);
-      });
+      state.playlists = state.playlists.reduce(
+        (array, playlist, id) =>
+          deleteSongFromCollections(array, playlist, id, action.payload),
+        new Array<IPlaylist>()
+      );
 
-      state.albums.forEach((playlist, id, array) => {
-        deleteSongFromCollections(playlist, id, array, action.payload, true);
-      });
+      state.albums = state.albums.reduce(
+        (array, playlist, id) =>
+          deleteSongFromCollections(array, playlist, id, action.payload, true),
+        new Array<IPlaylist>()
+      );
 
-      state.artists.forEach((playlist, id, array) => {
-        deleteSongFromCollections(playlist, id, array, action.payload, true);
-      });
+      state.artists = state.artists.reduce(
+        (array, playlist, id) =>
+          deleteSongFromCollections(array, playlist, id, action.payload, true),
+        new Array<IPlaylist>()
+      );
     },
     addTrackToPlaylist: (state, action) => {
-      const playlist = state.playlists.find(action.payload.playlistId);
-      playlist?.trackIds.push(action.payload.trackId);
+      const playlistToAddTo = state.playlists.find(
+        (playlist) => playlist.id === action.payload.playlistId
+      )!;
+      playlistToAddTo.trackIds.push(action.payload.trackId);
     },
     deleteTrackFromPlaylist: (state, action) => {
-      const playlist = state.playlists.find(action.payload.playlistId);
-      playlist?.trackIds.filter((id) => id !== action.payload.trackId);
+      const playlistToDeleteFrom = state.playlists.find(
+        (playlist) => playlist.id === action.payload.playlistId
+      )!;
+      playlistToDeleteFrom.trackIds = playlistToDeleteFrom.trackIds.filter(
+        (id) => id !== action.payload.trackId
+      );
     },
     createPlaylist: (state, action) => {
+      const { length } = state.playlists;
+      const newId =
+        length === 0
+          ? 0
+          : Number(state.playlists[length - 1].id.split('/', 2)[1]) + 1;
       state.playlists.push({
-        id: `playlists/${state.playlists.length}`,
+        id: `playlists/${newId}`,
         name: action.payload,
         cover: coverUnknown,
         trackIds: [],
       });
     },
     deletePlaylist: (state, action) => {
-      state.playlists.filter((track) => track.id !== action.payload);
+      state.playlists = state.playlists.filter(
+        (track) => track.id !== action.payload
+      );
     },
     changeTrackPositionInPlaylist: (state, action) => {
       const { prevIndex, newIndex } = action.payload;

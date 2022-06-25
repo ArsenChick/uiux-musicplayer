@@ -3,15 +3,30 @@ import './PlaylistHeader.scss';
 export interface IPlaylistHeaderProps {
   cover: string;
   name: string;
+  className?: string;
+  DeleteElement?: JSX.Element;
 }
 
-export const PlaylistHeader = ({ cover, name }: IPlaylistHeaderProps) => {
+export const PlaylistHeader = ({
+  cover,
+  name,
+  className,
+  DeleteElement,
+}: IPlaylistHeaderProps) => {
   return (
-    <div className="playlistHeaderWrapper">
+    <div className={`${className} playlistHeaderWrapper`}>
       <img src={cover} alt={`${name} album cover`} />
-      <h3>{name}</h3>
+      <div className="playlistInfo">
+        <h2>{name}</h2>
+        {DeleteElement}
+      </div>
     </div>
   );
+};
+
+PlaylistHeader.defaultProps = {
+  className: '',
+  DeleteElement: undefined,
 };
 
 export default PlaylistHeader;

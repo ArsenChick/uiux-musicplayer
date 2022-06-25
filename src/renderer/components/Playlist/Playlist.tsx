@@ -19,32 +19,28 @@ import {
   togglePlayPause,
 } from 'renderer/features/player/playerSlice';
 import { useAppDispatch, useAppSelector } from 'renderer/hooks/app';
-import { selectMultipleTracksInfo } from 'renderer/store/selectors';
+import { selectTrackVerboseInfo } from 'renderer/store/selectors';
 import UI from 'renderer/ui';
+import handleImg from '../../../../assets/img/dots.png';
+import './Playlist.scss';
 
 interface IPlaylistProps {
   playlistInfo: IPlaylist;
   isMainPlaylist?: boolean;
   allowReordering?: boolean;
-  showCard?: boolean;
-  ActionElement?: JSX.Element;
+  ActionElement?: React.FC<{ playlistId?: string; trackId?: number }>;
 }
 
 export const Playlist = ({
   playlistInfo,
   isMainPlaylist,
   allowReordering,
-  showCard,
   ActionElement,
 }: IPlaylistProps) => {
   const dispatch = useAppDispatch();
-  const {
-    currentTrackId: playingTrackId,
-    currentPlaylist: currentlyPlayingPlaylist,
-    isPlaying,
-  } = useAppSelector((state) => state.player);
-  const tracksInfo = useAppSelector(selectMultipleTracksInfo)(
-    playlistInfo.trackIds
+  const getTrackInfo = useAppSelector(selectTrackVerboseInfo);
+  const { currentTrackId, currentPlaylist, isPlaying } = useAppSelector(
+    (state) => state.player
   );
 
   const onDragEnd = (
@@ -69,21 +65,6 @@ export const Playlist = ({
     );
   };
 
-  useEffect(() => {
-    if (currentlyPlayingPlaylist.id === playlistInfo.id)
-      dispatch(
-        selectPlaylist({
-          id: playlistInfo.id,
-          trackIds: playlistInfo.trackIds,
-        })
-      );
-  }, [
-    playlistInfo.trackIds,
-    dispatch,
-    currentlyPlayingPlaylist.id,
-    playlistInfo.id,
-  ]);
-
   const onTrackClick = (trackId: number) => {
     dispatch(
       selectPlaylist({
@@ -91,21 +72,26 @@ export const Playlist = ({
         trackIds: playlistInfo.trackIds,
       })
     );
-    if (playingTrackId !== trackId) {
+    if (currentTrackId !== trackId) {
       dispatch(selectTrack(trackId));
     } else {
       dispatch(togglePlayPause());
     }
   };
 
+  useEffect(() => {
+    if (playlistInfo.id !== 'main' && playlistInfo.id === currentPlaylist.id) {
+      dispatch(
+        selectPlaylist({
+          id: playlistInfo.id,
+          trackIds: playlistInfo.trackIds,
+        })
+      );
+    }
+  }, [currentPlaylist.id, dispatch, playlistInfo.id, playlistInfo.trackIds]);
+
   return (
     <>
-      {showCard && (
-        <UI.PlaylistHeader
-          cover={playlistInfo.cover}
-          name={playlistInfo.name}
-        />
-      )}
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="playlistWrapper">
           <Droppable droppableId={playlistInfo.id.toString()}>
@@ -117,37 +103,62 @@ export const Playlist = ({
                 ref={dropProvided.innerRef}
                 {...dropProvided.droppableProps}
               >
-                {playlistInfo.trackIds.map((trackId, index) => (
-                  <div
-                    key={`${trackId}_${tracksInfo[index].title}`}
-                    onClick={() => onTrackClick(trackId)}
-                  >
-                    <Draggable draggableId={`${trackId}`} index={index}>
-                      {(dragProvided, dragSnapshot) => (
-                        <div
-                          className={`songWrapper ${
-                            dragSnapshot.isDragging ? 'dragging' : ''
-                          }`}
-                          ref={dragProvided.innerRef}
-                          {...dragProvided.draggableProps}
-                          {...dragProvided.dragHandleProps}
-                        >
-                          <UI.AudioCard
-                            audioInfo={tracksInfo[index]}
-                            className="audioCard"
-                            active={trackId === playingTrackId}
-                            isPlaying={isPlaying}
-                            onClickPlayPause={() => {
-                              dispatch(selectPlaylist(playlistInfo.trackIds));
-                              dispatch(togglePlayPause());
-                            }}
-                            showHoverPlay={trackId !== playingTrackId}
-                          />
-                        </div>
-                      )}
-                    </Draggable>
-                  </div>
-                ))}
+                {playlistInfo.trackIds.map((trackId, index) => {
+                  const trackInfo = getTrackInfo(trackId);
+                  return (
+                    <div
+                      key={`${trackId}_${trackInfo.title}`}
+                      onClick={() => onTrackClick(trackId)}
+                    >
+                      <Draggable
+                        draggableId={`${trackId}`}
+                        index={index}
+                        isDragDisabled={!allowReordering}
+                      >
+                        {(dragProvided, dragSnapshot) => (
+                          <div
+                            className={`songWrapper ${
+                              dragSnapshot.isDragging ? 'dragging' : ''
+                            } ${index % 2 === 0 ? 'even' : 'odd'}`}
+                            ref={dragProvided.innerRef}
+                            {...dragProvided.draggableProps}
+                          >
+                            <div
+                              className={`${
+                                allowReordering ? '' : 'hidden'
+                              } dragHandle`}
+                              {...dragProvided.dragHandleProps}
+                            >
+                              <img src={handleImg} alt="drag here" />
+                            </div>
+                            <UI.AudioCard
+                              audioInfo={trackInfo}
+                              className="audioCard"
+                              active={trackId === currentTrackId}
+                              isPlaying={isPlaying}
+                              onClickPlayPause={() => {
+                                dispatch(
+                                  selectPlaylist({
+                                    id: playlistInfo.id,
+                                    trackIds: playlistInfo.trackIds,
+                                  })
+                                );
+                                dispatch(togglePlayPause());
+                              }}
+                              showHoverPlay={trackId !== currentTrackId}
+                            />
+                            {ActionElement && (
+                              <ActionElement
+                                playlistId={playlistInfo.id}
+                                trackId={trackId}
+                              />
+                            )}
+                          </div>
+                        )}
+                      </Draggable>
+                    </div>
+                  );
+                })}
                 {dropProvided.placeholder}
               </div>
             )}
@@ -161,8 +172,7 @@ export const Playlist = ({
 Playlist.defaultProps = {
   isMainPlaylist: false,
   allowReordering: false,
-  showCard: true,
-  ActionElement: <div />,
+  ActionElement: undefined,
 };
 
 export default { Playlist };

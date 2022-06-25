@@ -1,9 +1,75 @@
-.activeTrackStatus.hover {
-  display: none;
+.audioCard {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+
+  .playerImg {
+    width: 4em;
+    height: 4em;
+    position: relative;
+    z-index: 999;
+    flex: 0 0 auto;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .activeTrackStatus {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+
+      font-size: 24px;
+      color: whitesmoke;
+      background-color: rgba($color: #000000, $alpha: 0.35);
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .svg {
+        position: static;
+      }
+    }
+
+    .activeTrackStatus.hover {
+      display: none;
+    }
+
+    .activeTrackStatus.hover.active {
+      display: flex;
+      opacity: 0;
+      transition: opacity 0.2s linear;
+    }
+  }
+
+  .shortInfo {
+    margin-left: 0.5em;
+    width: 0;
+    min-width: 0;
+    flex: 1 1 auto;
+
+    div {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .songTitle {
+      font-size: 1.125em;
+    }
+
+    .songArtistAlbum {
+      color: rgb(80, 80, 80);
+    }
+  }
 }
 
-.playerImg {
-  img {
-    height: 1em;
+.audioCard:hover {
+  .activeTrackStatus.hover.active {
+    opacity: 0.8;
   }
 }

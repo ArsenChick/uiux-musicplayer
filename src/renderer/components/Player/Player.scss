@@ -7,30 +7,78 @@ $playerHeight: 8em;
   bottom: 0;
   width: 100%;
   height: $playerHeight;
-  box-shadow: 0 0 2em 0.25em rgba(0, 0, 0, 0.05);
+  border-top: 1px solid #f0f0f0;
+
+  background-color: white;
 
   .playerContent {
+    height: 100%;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 
     .playerAudioCard {
       display: flex;
       align-items: center;
       width: $sideSegmentWidth;
+      margin-right: 1em;
 
-      img {
-        position: relative;
-        bottom: 0;
+      .playerImg {
+        position: static;
+        width: $playerHeight;
         height: $playerHeight;
       }
     }
 
     .playArea {
-      width: 50%
+      width: 50%;
+
+      .controlPanel {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto 1em;
+
+        .playButton {
+          margin: 0 0.5em;
+        }
+      }
+
+      .trackTimeline {
+        margin-right: -56px;
+      }
     }
 
-    .volumeArea {
+    .volumeAreaWrapper {
       width: $sideSegmentWidth;
+      min-width: 8em;
+
+      .volumeArea {
+        display: flex;
+        margin-left: 4em;
+
+        .volumeSlider {
+          margin-left: 0.5em;
+          flex-grow: 1;
+        }
+
+        svg {
+          position: relative;
+          bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .playerAudioCard {
+    .playerImg {
+      display: none;
+    }
+
+    .shortInfo {
+      margin-left: 1em;
     }
   }
 }

@@ -13,6 +13,9 @@ import {
   Volume2Icon,
   Volume3Icon,
   CirclePauseSolidIcon,
+  DeleteIcon,
+  CancelIcon,
+  MultiSelectIcon,
 } from '@fluentui/react-icons-mdl2';
 // import { initializeIcons } from '@fluentui/react';
 
@@ -32,6 +35,9 @@ registerIcons({
     Volume3: <Volume3Icon />,
     PlaySolid: <PlaySolidIcon />,
     CirclePause: <CirclePauseSolidIcon />,
+    Delete: <DeleteIcon />,
+    Cancel: <CancelIcon />,
+    MultiSelect: <MultiSelectIcon />,
   },
 });
 

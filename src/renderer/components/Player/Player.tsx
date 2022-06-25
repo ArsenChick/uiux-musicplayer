@@ -6,7 +6,7 @@ import useAudio from 'renderer/hooks/audio';
 import {
   canPlayNextTrackSelector,
   canPlayPrevTrackSelector,
-  selectCurrentTrackInfo,
+  selectCurrentTrackVerboseInfo,
 } from 'renderer/store/selectors';
 import {
   changeTimePosition,
@@ -31,7 +31,7 @@ export const Player = ({ className }: { className?: string }) => {
   const [isUserSeekingPos, setUserSeekingPos] = useState(false);
 
   const currentPlayerState = useAppSelector((state) => state.player);
-  const currentTrackInfo = useAppSelector(selectCurrentTrackInfo);
+  const currentTrackInfo = useAppSelector(selectCurrentTrackVerboseInfo);
   const canPlayNextTrack = useAppSelector(canPlayNextTrackSelector);
   const canPlayPrevTrack = useAppSelector(canPlayPrevTrackSelector);
 
@@ -46,9 +46,11 @@ export const Player = ({ className }: { className?: string }) => {
         dispatch(togglePlayPause());
       }
     };
-    window.addEventListener('keydown', spaceListenter);
+    if (currentTrackInfo.id !== -1)
+      window.addEventListener('keydown', spaceListenter);
+    else window.removeEventListener('keydown', spaceListenter);
     return () => window.removeEventListener('keydown', spaceListenter);
-  });
+  }, [currentTrackInfo.id, dispatch]);
 
   const onClickPlayPauseButton = () => {
     dispatch(togglePlayPause());
@@ -89,6 +91,16 @@ export const Player = ({ className }: { className?: string }) => {
     }
   };
 
+  const iconStyles = {
+    big: { fontSize: 32, height: 32 },
+    medium: { fontSize: 24, height: 24 },
+  };
+
+  const iconButtonStyles = {
+    big: { width: 44, height: 44 },
+    medium: { width: 36, height: 36 },
+  };
+
   return (
     <div className={`${className} playerWrapper`}>
       {currentPlayerState.currentTrackId !== null ? (
@@ -96,28 +108,32 @@ export const Player = ({ className }: { className?: string }) => {
           <AudioCard className="playerAudioCard" audioInfo={currentTrackInfo} />
 
           <div className="playArea">
-            <div className="control-panel">
+            <div className="controlPanel">
               <IconButton
-                iconProps={{ iconName: 'Previous' }}
+                iconProps={{ iconName: 'Previous', style: iconStyles.medium }}
+                style={iconButtonStyles.medium}
                 onClick={onSelectPrevTrack}
                 disabled={!canPlayPrevTrack}
               />
               <IconButton
+                className="playButton"
                 iconProps={
                   currentPlayerState.isPlaying
-                    ? { iconName: 'Pause' }
-                    : { iconName: 'PlaySolid' }
+                    ? { iconName: 'Pause', style: iconStyles.big }
+                    : { iconName: 'PlaySolid', style: iconStyles.big }
                 }
+                style={iconButtonStyles.big}
                 onClick={onClickPlayPauseButton}
               />
               <IconButton
-                iconProps={{ iconName: 'Next' }}
+                iconProps={{ iconName: 'Next', style: iconStyles.medium }}
+                style={iconButtonStyles.medium}
                 onClick={onSelectNextTrack}
                 disabled={!canPlayNextTrack}
               />
             </div>
 
-            <div className="track-timeline">
+            <div className="trackTimeline">
               <Slider
                 min={0}
                 max={Math.ceil(currentPlayerState.durationInSeconds)}
@@ -130,25 +146,28 @@ export const Player = ({ className }: { className?: string }) => {
                 onChange={onSeekingNewPos}
                 onChanged={onChangedCurrentPos}
                 valueFormat={fromSecondsToFormattedTime}
+                styles={{ slideBox: { padding: '0 1em' } }}
               />
             </div>
           </div>
 
-          <div className="volumeArea">
-            <Icon iconName={getVolumeIconName(currentPlayerState.volume)} />
-            <Slider
-              className="volume-slider"
-              min={0}
-              max={1}
-              step={0.01}
-              value={currentPlayerState.volume}
-              onChange={onChangeVolume}
-              valueFormat={toPercentString}
-            />
+          <div className="volumeAreaWrapper">
+            <div className="volumeArea">
+              <Icon iconName={getVolumeIconName(currentPlayerState.volume)} />
+              <Slider
+                className="volumeSlider"
+                min={0}
+                max={1}
+                step={0.01}
+                value={currentPlayerState.volume}
+                onChange={onChangeVolume}
+                valueFormat={toPercentString}
+              />
+            </div>
           </div>
         </div>
       ) : (
-        <div className="no-track-message">
+        <div className="noTrackMessage">
           It&#39;s quiet here... Choose any track to listen to!
         </div>
       )}

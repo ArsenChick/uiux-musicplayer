@@ -1,16 +1,20 @@
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+
 import { Player } from './components/Player/Player';
-import { Playlist } from './components/Playlist/Playlist';
 import { Sidebar } from './components/Sidebar/Sidebar';
 import { MusicLibrary } from './components/MusicLibrary/MusicLibrary';
+import { CustomPlaylist } from './components/Playlist/wrappers/CustomPlaylist';
 import './App.scss';
-import { useAppSelector } from './hooks/app';
+import { fromFileToBlobSrc, isAudioType } from './utils';
 import {
-  selectAlbumInfo,
-  selectArtistInfo,
-  selectPlaylistInfo,
-} from './store/selectors';
-import { IPlaylist } from './features/library/librarySlice';
+  addTrackToLibrary,
+  createTrack,
+} from './features/library/librarySlice';
+import { AlbumArtistPlaylist } from './components/Playlist/wrappers/AlbumArtistPlaylist';
+import { MediaGrid } from './components/MediaGrid/MediaGrid';
+import { useAppSelector } from './hooks/app';
 
 const Hello = ({ name }: any) => {
   return (
@@ -20,59 +24,86 @@ const Hello = ({ name }: any) => {
   );
 };
 
-const PlaylistWrapper = () => {
-  const location = useLocation();
-  const [type, id] = location.pathname.slice(1).split('/', 2);
-
-  const getArtistInfo = useAppSelector(selectArtistInfo);
-  const getAlbumInfo = useAppSelector(selectAlbumInfo);
-  const getPlaylistInfo = useAppSelector(selectPlaylistInfo);
-
-  let playlistInfo: IPlaylist | undefined;
-  let allowReordering: boolean;
-  switch (type) {
-    case 'artists': {
-      playlistInfo = getArtistInfo(Number(id));
-      allowReordering = false;
-      break;
-    }
-    case 'albums': {
-      playlistInfo = getAlbumInfo(Number(id));
-      allowReordering = false;
-      break;
-    }
-    case 'playlists': {
-      playlistInfo = getPlaylistInfo(Number(id));
-      allowReordering = true;
-      break;
-    }
-    default: {
-      return <Navigate to="/" replace />;
-    }
-  }
-
-  return (
-    <Playlist
-      playlistInfo={playlistInfo!}
-      allowReordering={allowReordering}
-      showCard
-    />
-  );
-};
-
 export default function App() {
+  const dispatch = useDispatch();
+  const [dragFile, setDragFile] = useState(false);
+  const navigate = useNavigate();
+
+  const albums = useAppSelector((state) => state.library.albums);
+  const artists = useAppSelector((state) => state.library.artists);
+
+  const dragStartHandler = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragFile(true);
+  };
+
+  const dragLeaveHandler = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragFile(false);
+  };
+
+  const dropHandler = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragFile(false);
+    const trackFiles = e.dataTransfer.files;
+
+    Array.from(trackFiles).forEach(async (track) => {
+      if (isAudioType(track)) {
+        const trackSrc = await fromFileToBlobSrc(track);
+        if (typeof trackSrc === 'string') {
+          const trackItem = createTrack(trackSrc, track.name);
+          dispatch(addTrackToLibrary(trackItem));
+        }
+      }
+    });
+
+    navigate('/');
+  };
+
   return (
     <>
       <Sidebar />
-      <Routes>
-        <Route path="/" element={<MusicLibrary />} />
-        <Route path="albums" element={<Hello name="Albums" />} />
-        <Route path="artists" element={<Hello name="Artists" />} />
-        <Route path="playlists">
-          <Route path=":playlistId" element={<PlaylistWrapper />} />
-        </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      {dragFile ? (
+        <div
+          className="dragTrackWindow"
+          onDragStart={(e) => dragStartHandler(e)}
+          onDragOver={(e) => dragStartHandler(e)}
+          onDragLeave={(e) => dragLeaveHandler(e)}
+          onDrop={(e) => dropHandler(e)}
+        >
+          Drag file here to add to track
+        </div>
+      ) : (
+        <div
+          className="mainViewContainer"
+          onDragStart={(e) => dragStartHandler(e)}
+          onDragOver={(e) => dragStartHandler(e)}
+          onDragLeave={(e) => dragLeaveHandler(e)}
+        >
+          <Routes>
+            <Route path="/" element={<MusicLibrary />} />
+            <Route path="albums">
+              <Route
+                index
+                element={<MediaGrid header="Albums" items={albums} />}
+              />
+              <Route path=":albumId" element={<AlbumArtistPlaylist />} />
+            </Route>
+            <Route path="artists">
+              <Route
+                index
+                element={<MediaGrid header="Artists" items={artists} />}
+              />
+              <Route path=":artistId" element={<AlbumArtistPlaylist />} />
+            </Route>
+            <Route path="playlists">
+              <Route path=":playlistId" element={<CustomPlaylist />} />
+            </Route>
+            {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
+          </Routes>
+        </div>
+      )}
+
       <Player />
     </>
   );
