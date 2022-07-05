@@ -59,11 +59,11 @@ export const Sidebar = ({ className }: any) => {
     links: [],
   };
 
-  playlists.forEach((playlist, id) => {
+  playlists.forEach((playlist) => {
     navPlaylistGroup.links.push({
       name: playlist.name,
-      url: `/playlists/${id}`,
-      key: `playlists/${id}`,
+      url: `${playlist.id}`,
+      key: `${playlist.id}`,
     });
   });
   navPlaylistGroup.links.push({

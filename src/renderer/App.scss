@@ -27,6 +27,10 @@ body {
   // align-items: center;
 }
 
+div, img, p, h1, h2, h3, h4, span {
+  user-select: none;
+}
+
 #root {
   display: flex;
   height: 100%;
